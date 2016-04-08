@@ -3,11 +3,11 @@ import csv
 
 def main():
 
-    with open('u.item') as f:
-        reader = csv.reader(f, delimiter='|')
-        with open('README.md', a) as w:
-        for row in f:
-            w.write(row[0] + ": " + row[1])
+    # with open('README.md', 'a') as w:
+    with open('u.data') as f:
+        reader = csv.DictReader(f, fieldnames=['user', 'title'], delimiter= '\t')
+        for row in reader:
+            print(row['user'] + ": " + row['title'] + "\n")
 
 
 
