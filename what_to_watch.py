@@ -225,6 +225,11 @@ def get_similarity_list(user_dict, user):
     return sorted(similarity_list, key=sorter, reverse=True)
 
 
+def print_similar_recommendations(id_to_title, recommendation_list):
+    for i, item in enumerate(recommendation_list):
+        print("{}. {}".format(i + 1, id_to_title[item[0]]))
+
+
 def main():
     clear()
     # movie_ratings_dict = {MovieID: [user_id, rating]}
@@ -272,7 +277,9 @@ def main():
     # print(similarity_list)
 
     recommendation_list = find_highest_rated_by_similar_users(user_dict, similarity_list, user)
-    print("\nRecommended list: ", recommendation_list)
+    # print("\nRecommended list: ", recommendation_list)
+
+    print_similar_recommendations(id_to_title, recommendation_list)
 
 
 
