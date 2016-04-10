@@ -118,6 +118,16 @@ def set_ids_to_titles(movie_dict):
     return id_to_title
 
 
+def find_top_picks(movie_dict):
+    top_picks = []
+    for i in movie_dict:
+        top_picks.append((i, movie_dict[i].average))
+    return sorted(top_picks, key=sorter, reverse=True)
+
+def sorter(val):
+    return val[1]
+
+
 
 
 def main():
@@ -128,7 +138,7 @@ def main():
 
     # movie_dict = {MovieID: MovieObject}
     movie_dict = get_movie_dict(movie_ratings_dict)
-    # print(movie_dict[44].average)
+    # print(movie_dict[40])
 
     # id_to_title = {ID: Title}
     id_to_title = set_ids_to_titles(movie_dict)
@@ -138,9 +148,13 @@ def main():
     user_ratings_dict = get_user_ratings_dict()
     # print(user_ratings_dict[2][:3])
 
-
+    # user_dict = {UserID: UserObject}
     user_dict = get_user_dict(user_ratings_dict)
-    print(user_dict[356].ratings[:3])
+    # print(user_dict[356].ratings[:3])
+
+    #top_picks = [(movie, rating)]
+    top_picks = find_top_picks(movie_dict)
+    print(top_picks[:21])
 
 
 if __name__ == '__main__':
