@@ -38,12 +38,16 @@ class User:
         self.sex = row['Sex']
         self.occupation = row['Occupation']
         self.ratings = ratings
+        self.highest_rated = self.find_highest_rated(self.ratings)
 
     def __str__(self):
         return str("{}: Age: {}; Sex: {}; Occupation: {}; Ratings: {}".format(self.user_id, self.age, self.sex, self.occupation, self.ratings))
 
     def __repr__(self):
         return str(self)
+
+    def find_highest_rated(self, ratings):
+        return sorted(ratings, key=sorter, reverse=True)
 
 
 
@@ -151,11 +155,15 @@ def show_top_picks_with_title(movie_dict, top_picks, id_to_title, number_to_show
 
 
 def get_common_user_ratings(user_dict, user1, user2):
+    # print("UserID 1: ", user1)
+    # print("UserID 2: ", user2)
     a = set([i[0] for i in user_dict[user1].ratings])
-
+    # print("\nGetting common rating set a: ", a)
     b = set([i[0] for i in user_dict[user2].ratings])
+    # print("\nGetting common rating set b: ", b)
+
     common = a & b
-    print("\nCommon: ", common)
+    # print("\nCommon: ", sorted(common))
     return sorted(common)
 
 
@@ -172,10 +180,10 @@ def euclidean_distance(user_dict, user, user2, movies_both_rated):
     """Given two lists, give the Euclidean distance between them on a scale
     of 0 to 1. 1 means the two lists are identical.
     """
-
-    if len(movies_both_rated) is 0:
-        print("Those users have not rated any of the same movies, so we can't compare their tastes.")
-        return ''
+    # print("\nLength of common list: ", len(movies_both_rated))
+    if len(movies_both_rated) < 5:
+        # print("Those users have not rated any of the same movies, so we can't compare their tastes.")
+        return 0
 
     a = get_ratings_for_common_list(user_dict, user, movies_both_rated)
     b = get_ratings_for_common_list(user_dict, user2, movies_both_rated)
@@ -185,7 +193,36 @@ def euclidean_distance(user_dict, user, user2, movies_both_rated):
     squares = [diff ** 2 for diff in differences]
     sum_of_squares = sum(squares)
 
-    return 1 / (1 + math.sqrt(sum_of_squares))
+    return float("%.2f" % (1 / (1 + math.sqrt(sum_of_squares))))
+
+
+def find_highest_rated_by_similar_users(user_dict, similarity_list, user):
+    highest_rated_movies = []
+    for i in similarity_list[:25]:
+        count = 0
+        common = get_common_user_ratings(user_dict, user, i[0])
+        # print("\nCommon: ", common)
+        # Know what movies they have both rated. common = movieID set
+        # while count < 6:
+        for r in user_dict[i[0]].ratings[:10]:
+            # print("\nStart of i.ratings loop item: ", r)
+            if r[0] not in common:
+                count += 1
+                # print("Count: ", count)
+                highest_rated_movies.append((r[0], r[1] * i[1]))
+
+    return sorted(highest_rated_movies[:10], key=sorter, reverse=True)
+
+
+def get_similarity_list(user_dict, user):
+    similarity_list = []
+    for userID in user_dict:
+        common = get_common_user_ratings(user_dict, user, userID)
+        sim = euclidean_distance(user_dict, user, userID, common)
+        similarity_list.append((userID, sim))
+        # print("\n\nSimilarity list: ", similarity_list)
+    # print("\nSorted sim list: ", sorted(similarity_list, key=sorter, reverse=True))
+    return sorted(similarity_list, key=sorter, reverse=True)
 
 
 def main():
@@ -209,27 +246,33 @@ def main():
     # user_dict = {UserID: UserObject}
     user_dict = get_user_dict(user_ratings_dict)
     # print(user_dict[356].ratings[:3])
-
+    # print("User dict, highest ratings from X: ", user_dict[1].highest_rated)
     #top_picks = [(movie, rating)]
     top_picks = find_top_picks(movie_dict)
     # print(top_picks[:10])
     # print('\nTop: ')
 
-    show_top_picks_with_title(movie_dict, top_picks, id_to_title, 30)
+    # show_top_picks_with_title(movie_dict, top_picks, id_to_title, 30)
     # print(show_top_picks_with_title([top_picks[:20]], movie_ratings_dict))
 
     user = 25
     user2 = 1
     top_picks_for_user = find_top_picks_for_user(movie_ratings_dict, user_ratings_dict, top_picks, user)
     # print('\nUser top: ', top_picks_for_user[:3])
-    show_top_picks_with_title(movie_dict, top_picks_for_user, id_to_title, 40)
+    # show_top_picks_with_title(movie_dict, top_picks_for_user, id_to_title, 40)
     # print('\nUser top: ')
     # print(top_picks_for_user[:20])
     # print('\nShow method top picks: ')
     movies_both_rated = get_common_user_ratings(user_dict, user, user2)
-    # print(common_ratings)
+    # print("\nMovies both rated: ", movies_both_rated)
     similarity = euclidean_distance(user_dict, user, user2, movies_both_rated)
-    print("Similarity: ", similarity)
+    # print("Similarity: ", similarity)
+
+    similarity_list = get_similarity_list(user_dict, user)
+    # print(similarity_list)
+
+    recommendation_list = find_highest_rated_by_similar_users(user_dict, similarity_list, user)
+    print("\nRecommended list: ", recommendation_list)
 
 
 
