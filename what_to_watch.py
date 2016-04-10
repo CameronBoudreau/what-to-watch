@@ -15,6 +15,7 @@ class Movie:
         self.title = row['MovieTitle']
         self.ratings = ratings
         self.average = self.find_average_rating(ratings)
+        self.number_of_ratings = len(ratings)
 
     def __str__(self):
         return "{}: {}".format(self.id, self.title)
@@ -118,23 +119,41 @@ def set_ids_to_titles(movie_dict):
     return id_to_title
 
 
-def find_top_picks(movie_dict):
+def find_top_picks(movie_dict, number_of_ratings=1):
     top_picks = []
     for i in movie_dict:
-        top_picks.append((i, movie_dict[i].average))
+        if movie_dict[i].number_of_ratings >= number_of_ratings:
+            top_picks.append((i, movie_dict[i].average))
+
     return sorted(top_picks, key=sorter, reverse=True)
+
+def find_top_picks_for_user(movie_ratings_dict, user_ratings_dict, top_picks, user):
+    user_top_picks = top_picks
+    print("Rating for first movie to find user picks (is 1 in it?): \n", movie_ratings_dict[318])
+    for pick in top_picks:
+        for i in movie_ratings_dict[pick[0]]:
+            if i[0] == pick[0]:
+                user_top_picks.remove(pick)
+    return user_top_picks
+
 
 def sorter(val):
     return val[1]
 
-
+def show_top_picks_with_title(movie_dict, top_picks, id_to_title, number_to_show=20):
+    count = 1
+    for i in top_picks:
+        if count >= number_to_show:
+            return ''
+        print(id_to_title[i[0]] + ':', i[1])
+        count += 1
 
 
 def main():
     clear()
-    # ratings_dict = {MovieID: [user_id, rating]}
+    # movie_ratings_dict = {MovieID: [user_id, rating]}
     movie_ratings_dict = get_movie_ratings_dict()
-    # print(movie_ratings_dict[16][:3])
+    # print(movie_ratings_dict[1449])
 
     # movie_dict = {MovieID: MovieObject}
     movie_dict = get_movie_dict(movie_ratings_dict)
@@ -146,16 +165,26 @@ def main():
 
     # user_ratings_dict = {UserID:[movie_id, rating]}
     user_ratings_dict = get_user_ratings_dict()
-    # print(user_ratings_dict[2][:3])
+    # print(user_ratings_dict[1])
 
     # user_dict = {UserID: UserObject}
     user_dict = get_user_dict(user_ratings_dict)
     # print(user_dict[356].ratings[:3])
 
     #top_picks = [(movie, rating)]
-    top_picks = find_top_picks(movie_dict)
-    print(top_picks[:21])
+    top_picks = find_top_picks(movie_dict, 20)
+    print(top_picks[:10])
+    print('\nTop: ')
 
+    show_top_picks_with_title(movie_dict, top_picks, id_to_title, 30)
+    # print(show_top_picks_with_title([top_picks[:20]], movie_ratings_dict))
+
+    user = 1
+    top_picks_for_user = find_top_picks_for_user(movie_ratings_dict, user_ratings_dict, top_picks, user)
+    print('\nUser top: ')
+    print(top_picks_for_user[:20])
+    print('\nShow method top picks: ')
+    show_top_picks_with_title(movie_dict, top_picks_for_user, id_to_title, 40)
 
 if __name__ == '__main__':
     main()

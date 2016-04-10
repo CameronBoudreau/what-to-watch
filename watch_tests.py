@@ -24,3 +24,6 @@ def test_get_user_ratings():
 
 def test_find_ratings_in_user_object():
     assert user_dict[356].ratings[:3] == [(313, 5), (937, 2), (689, 5)]
+
+def test_find_top_picks():
+    assert find_top_picks(movie_dict, 20)[:3] == [(408, 4.49), (169, 4.47), (318, 4.47)]
