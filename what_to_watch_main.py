@@ -29,6 +29,8 @@ class Movie:
         self.ratings = ratings
         self.average = self.find_average_rating(ratings)
         self.number_of_ratings = len(ratings)
+        self.url = row['URL']
+        self.genres = self.set_genre_list(row)
 
     def __str__(self):
         return "{}: {}".format(self.id, self.title)
@@ -39,6 +41,11 @@ class Movie:
     def find_average_rating(self, ratings):
         total = sum([t[1] for t in ratings])
         return float("%.2f" % (total / len(ratings)))
+
+    def set_genre_list(self, row):
+        for i in row[4:]:
+            if row[i] == 1:
+                self.genres.append(i)
 
 
 
@@ -80,7 +87,9 @@ class Rating:
 def get_movie_dict(movie_ratings_dict):
     with open('u.item', encoding='latin_1') as f:
         movie_dict = {}
-        reader = csv.DictReader(f, fieldnames=['MovieID', 'MovieTitle'], delimiter='|')
+        reader = csv.DictReader(f, fieldnames=['MovieID', 'MovieTitle', 'Release', '', 'URL', 'Unknown', 'Action' | 'Adventure' | 'Animation' |
+              'Children\'s' | 'Comedy' | 'Crime' | 'Documentary' | 'Drama' | 'Fantasy', 'Film-Noir' | 'Horror' | 'Musical' | 'Mystery' | 'Romance' | 'Sci-Fi' |
+              Thriller | War | Western], delimiter='|')
         for row in reader:
             movie_dict[int(row['MovieID'])] = Movie(row, movie_ratings_dict[int(row['MovieID'])])
     return movie_dict
@@ -117,8 +126,6 @@ def get_user_dict(user_ratings_dict):
             for row in reader:
                 user_dict[int(row['UserID'])] = User(row, user_ratings_dict[int(row['UserID'])])
         return user_dict
-
-
 
 
 def set_ids_to_titles(movie_dict):
@@ -287,9 +294,9 @@ def is_valid_track_input(track):
 def ask_for_movie_or_user_track(movie_or_user_info_message):
     track = input("Please select from the following options:\n\n1) Browse movie information\n2) Browse user information\n\n>")
 
-    if is_valid_movie_or_user_track_input(track, movie_or_user_info_message):
+    if is_valid_track_input(track):
+        clear()
         return int(track)
-
     else:
         clear()
         print_title_bar(movie_or_user_info_message)
@@ -297,31 +304,31 @@ def ask_for_movie_or_user_track(movie_or_user_info_message):
         return ask_for_movie_or_user_track(movie_or_user_info_message)
 
 
-def is_valid_movie_or_user_track_input(track, movie_or_user_info_message):
-    try:
-        int(track)
-    except:
-        return False
-    if int(track) != 1 and int(track) != 2:
-        return False
+# def is_valid_movie_or_user_track_input(track, movie_or_user_info_message):
+#     try:
+#         int(track)
+#     except:
+#         return False
+#     if int(track) != 1 and int(track) != 2:
+#         return False
+#
+#     return True
 
-    return True
 
-
-def does_know_id(movie_info_message):
-
+def does_know_id(movie_or_user_info_message):
 
     knows = input("Do you know the ID of the movie you want to check? Don't worry if you don't - we'll help you find it! Just enter 'Y' for yes or 'N' for no.\n>")
-    if check_knows(knows, movie_info_message):
+    if check_knows(knows, movie_or_user_info_message):
+        clear()
         if knows.lower() == 'y':
             return True
         else:
             return False
     else:
         clear()
-        print_title_bar(movie_info_message)
+        print_title_bar(movie_or_user_info_message)
         print(("*" * 25) + '\n' + "Enter a valid choice.\n" + ("*" * 25) + '\n')
-        return does_know_id(movie_info_message)
+        return does_know_id(movie_or_user_info_message)
 
 
 def check_knows(knows, movie_info_message):
@@ -332,20 +339,51 @@ def check_knows(knows, movie_info_message):
 
     return True
 
-def get_movie_id():
-    movie_id = input("Enter the numeric ID for the movie you want to access. If you need to go back to search for the code, enter 0.\n>")
-    check_movie_id(movie_id)
-    return movie_id
+def get_movie_id(lets_find_your_movie_message, search_for_movie_message):
+    movie_id = input("Please enter the numeric ID for the movie you want to access. If you need to go back to search for the code, enter 0.\n>")
+    if is_valid_movie_id(movie_id, search_for_movie_message):
+        clear()
+        return int(movie_id)
+    else:
+        clear()
+        print_title_bar(lets_find_your_movie_message)
+        print(("*" * 25) + '\n' + "Enter a valid Movie ID.\n" + ("*" * 25) + '\n')
+        return get_movie_id(lets_find_your_movie_message, search_for_movie_message)
 
-def check_movie_id(movie_id):
+def is_valid_movie_id(movie_id):
     try:
         int(movie_id)
     except:
+        return False
+    if int(movie_id) == 0:
         clear()
-        return get_movie_id()
-    if int(track) == 0:
+        print_title_bar(search_for_movie_message)
+        return search_for_movies(search_for_movie_message)
+    return True
+
+def display_movie_info(movie_dict, movie_id, movie_title):
+    state = input("Would you like to:\n\n1) See general information about this movie\n2) See ratings for this movie\n>")
+
+    if is_valid_track_input(state):
         clear()
-        return search_for_movies()
+        if state = 1:
+            print_title_bar(movie_title)
+            show_general_movie_info(movie_dict, movie_id, movie_title)
+        else:
+            print_title_bar(movie_title)
+            show_movie_ratings_info(movie_dict, movie_id, movie_title)
+    else:
+        clear()
+        print_title_bar(movie_title)
+        print(("*" * 25) + '\n' + "Enter a valid choice.\n" + ("*" * 25) + '\n')
+        return display_movie_info(movie_dict, movie_id, movie_title)
+
+
+def show_general_movie_info(movie_dict, movie_id, movie_title):
+    print("ID: {}\nAverage Rating: {}\nGenres: {}\n")
+    option = input("From here, you can:\n\n1)See ratings details\n2) Look up another movie\n3)Exit to the main menu\n>")
+
+
 
 
 def main():
@@ -383,9 +421,13 @@ def main():
         print_title_bar(movie_or_user_info_message)
         movie_or_user_info = ask_for_movie_or_user_track(movie_or_user_info_message)
         if movie_or_user_info == 1:
-            if does_know_id(movie_info_message):
+            print_title_bar(movie_or_user_info_message)
+            if does_know_id(movie_or_user_info_message):
                 print_title_bar(lets_find_your_movie_message)
-                movie_id = get_movie_id()
+                movie_id = get_movie_id(lets_find_your_movie_message)
+                movie_title = id_to_title[movie_id]
+                print_title_bar(movie_title)
+                display_movie_info(movie_dict, movie_id, movie_title, movie_info_message)
             else:
                 print_title_bar(search_for_movie_message)
                 search_for_movies(movie_dict)
