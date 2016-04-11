@@ -1,6 +1,18 @@
 import csv
 import os
 import math
+from time import sleep
+import sys
+
+
+def print_text(a_string, a_is_slow):
+    if a_is_slow:
+        for words in a_string + "\n":
+            sys.stdout.write(words)
+            sys.stdout.flush()
+            sleep(.03)
+    else:
+        print(a_string)
 
 
 def clear():
@@ -106,14 +118,6 @@ def get_user_dict(user_ratings_dict):
                 user_dict[int(row['UserID'])] = User(row, user_ratings_dict[int(row['UserID'])])
         return user_dict
 
-
-# def get_rating_list(movie_ratings_dict, row):
-#     rating_list = []
-#     for key in movie_ratings_dict:
-#         for rating in movie_ratings_dict[key]:
-#             if rating[0] == row['UserID']:
-#                 rating_list.append(rating)
-#     return rating_list
 
 
 
@@ -230,48 +234,178 @@ def print_similar_recommendations(id_to_title, recommendation_list):
         print("{}. {}".format(i + 1, id_to_title[item[0]]))
 
 
+def print_title_bar(text):
+    print(("#" * (len(text) + 10)))
+    print(("#" + ' ' * (len(text) + 8) + '#'))
+    print("#    {}    #".format(text))
+    print(("#" + ' ' * (len(text) + 8) + '#'))
+    print(("#" * (len(text) + 10)) + '\n\n')
+
+
+def get_user_id(user_dict, greeting):
+    user_id = input("Please input your User ID:\n>")
+    if is_valid_user_id_input(user_dict, user_id, greeting):
+        return int(user_id)
+    else:
+        clear()
+        print_title_bar(greeting)
+        print(("*" * 25) + '\n' + "Enter a valid User ID.\n" + ("*" * 25) + '\n')
+        return get_user_id(user_dict, greeting)
+
+
+def is_valid_user_id_input(user_dict, user_id, greeting):
+    try:
+        int(user_id)
+    except:
+        return False
+    if int(user_id) not in user_dict.keys():
+        return False
+
+    return True
+
+def ask_for_track_choice(track_choice_message):
+    track = input("Please select from the following options:\n\n1) Browse movie and rating information\n2) Get movie recommendations\n\n>")
+
+    if is_valid_track_input(track):
+        return int(track)
+    else:
+        clear()
+        print_title_bar(track_choice_message)
+        print(("*" * 25) + '\n' + "Enter a valid choice.\n" + ("*" * 25) + '\n')
+        return ask_for_track_choice(track_choice_message)
+
+def is_valid_track_input(track):
+    try:
+        int(track)
+    except:
+        return False
+    if int(track) != 1 and int(track) != 2:
+        return False
+
+    return True
+
+def ask_for_movie_or_user_track(movie_or_user_info_message):
+    track = input("Please select from the following options:\n\n1) Browse movie information\n2) Browse user information\n\n>")
+
+    if is_valid_movie_or_user_track_input(track, movie_or_user_info_message):
+        return int(track)
+
+    else:
+        clear()
+        print_title_bar(movie_or_user_info_message)
+        print(("*" * 25) + '\n' + "Enter a valid choice.\n" + ("*" * 25) + '\n')
+        return ask_for_movie_or_user_track(movie_or_user_info_message)
+
+
+def is_valid_movie_or_user_track_input(track, movie_or_user_info_message):
+    try:
+        int(track)
+    except:
+        return False
+    if int(track) != 1 and int(track) != 2:
+        return False
+
+    return True
+
+
+def does_know_id(movie_info_message):
+
+
+    knows = input("Do you know the ID of the movie you want to check? Don't worry if you don't - we'll help you find it! Just enter 'Y' for yes or 'N' for no.\n>")
+    if check_knows(knows, movie_info_message):
+        if knows.lower() == 'y':
+            return True
+        else:
+            return False
+    else:
+        clear()
+        print_title_bar(movie_info_message)
+        print(("*" * 25) + '\n' + "Enter a valid choice.\n" + ("*" * 25) + '\n')
+        return does_know_id(movie_info_message)
+
+
+def check_knows(knows, movie_info_message):
+    if not knows.isalpha():
+        return False
+    elif knows.lower() != 'y' and knows.lower() != 'n':
+        return False
+
+    return True
+
+def get_movie_id():
+    movie_id = input("Enter the numeric ID for the movie you want to access. If you need to go back to search for the code, enter 0.\n>")
+    check_movie_id(movie_id)
+    return movie_id
+
+def check_movie_id(movie_id):
+    try:
+        int(movie_id)
+    except:
+        clear()
+        return get_movie_id()
+    if int(track) == 0:
+        clear()
+        return search_for_movies()
+
+
 def main():
     clear()
+    greeting = "Welcome to Movie Meaven!"
+    track_choice_message = "How would you like to explore the collection?"
+    movie_or_user_info_message = "What information are you looking for?"
+    movie_info_message = "Let's find a movie!"
+    lets_find_your_movie_message = "Let's find your movie!"
+    search_for_movie_message = "We can help you find what you're looking for!"
+
+    print_title_bar(greeting)
     # movie_ratings_dict = {MovieID: [user_id, rating]}
     movie_ratings_dict = get_movie_ratings_dict()
     # print(movie_ratings_dict[1449])
-
     # movie_dict = {MovieID: MovieObject}
     movie_dict = get_movie_dict(movie_ratings_dict)
     # print(movie_dict[40])
-
     # id_to_title = {ID: Title}
     id_to_title = set_ids_to_titles(movie_dict)
     # print(id_to_title[2])
-
     # user_ratings_dict = {UserID:[movie_id, rating]}
     user_ratings_dict = get_user_ratings_dict()
     # print(user_ratings_dict[1])
-
     # user_dict = {UserID: UserObject}
     user_dict = get_user_dict(user_ratings_dict)
+
+    user = get_user_id(user_dict, greeting)
+    clear()
+    print_title_bar(track_choice_message)
+
+    track_choice = ask_for_track_choice(track_choice_message)
+    if track_choice == 1:
+        clear()
+        print_title_bar(movie_or_user_info_message)
+        movie_or_user_info = ask_for_movie_or_user_track(movie_or_user_info_message)
+        if movie_or_user_info == 1:
+            if does_know_id(movie_info_message):
+                print_title_bar(lets_find_your_movie_message)
+                movie_id = get_movie_id()
+            else:
+                print_title_bar(search_for_movie_message)
+                search_for_movies(movie_dict)
+
+
+
+
+
     # print(user_dict[356].ratings[:3])
     # print("User dict, highest ratings from X: ", user_dict[1].highest_rated)
-    #top_picks = [(movie, rating)]
     top_picks = find_top_picks(movie_dict)
     # print(top_picks[:10])
-    # print('\nTop: ')
 
     # show_top_picks_with_title(movie_dict, top_picks, id_to_title, 30)
-    # print(show_top_picks_with_title([top_picks[:20]], movie_ratings_dict))
 
-    user = 25
-    user2 = 1
     top_picks_for_user = find_top_picks_for_user(movie_ratings_dict, user_ratings_dict, top_picks, user)
-    # print('\nUser top: ', top_picks_for_user[:3])
     # show_top_picks_with_title(movie_dict, top_picks_for_user, id_to_title, 40)
-    # print('\nUser top: ')
     # print(top_picks_for_user[:20])
-    # print('\nShow method top picks: ')
     movies_both_rated = get_common_user_ratings(user_dict, user, user2)
-    # print("\nMovies both rated: ", movies_both_rated)
     similarity = euclidean_distance(user_dict, user, user2, movies_both_rated)
-    # print("Similarity: ", similarity)
 
     similarity_list = get_similarity_list(user_dict, user)
     # print(similarity_list)

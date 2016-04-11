@@ -1,4 +1,4 @@
-from what_to_watch import *
+from what_to_watch_no_ui_working import *
 
 user = 25
 movie_ratings_dict = get_movie_ratings_dict()
@@ -6,7 +6,7 @@ movie_dict = get_movie_dict(movie_ratings_dict)
 id_to_title = set_ids_to_titles(movie_dict)
 user_ratings_dict = get_user_ratings_dict()
 user_dict = get_user_dict(user_ratings_dict)
-top_picks = find_top_picks(movie_dict)
+top_picks = find_top_picks(movie_dict, 20)
 top_picks_for_user = find_top_picks_for_user(movie_ratings_dict, user_ratings_dict, top_picks, user)
 
 
@@ -32,4 +32,4 @@ def test_find_top_picks():
     assert find_top_picks(movie_dict, 20)[:3] == [(408, 4.49), (169, 4.47), (318, 4.47)]
 
 def test_find_top_picks_for_user():
-    assert find_top_picks_for_user(movie_ratings_dict, user_ratings_dict, top_picks, user)[:3] == [(814, 5.0), (1122, 5.0), (1189, 5.0)]
+    assert find_top_picks_for_user(movie_ratings_dict, user_ratings_dict, top_picks, user)[:3] == [(408, 4.49), (169, 4.47), (483, 4.46)]
