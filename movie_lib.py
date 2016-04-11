@@ -131,7 +131,6 @@ def find_top_picks_for_user(movie_ratings_dict, user_ratings_dict, top_picks, us
         for i in movie_ratings_dict[pick[0]]:
             if i[0] == pick[0]:
                 user_top_picks.remove(pick)
-    print("User top 3 picks: ", user_top_picks[:3])
     return user_top_picks
 
 
@@ -212,7 +211,8 @@ def get_similarity_list(user_dict, user):
     for userID in user_dict:
         common = get_common_user_ratings(user_dict, user, userID)
         sim = euclidean_distance(user_dict, user, userID, common)
-        similarity_list.append((userID, sim))
+        if len(common) > 3:
+            similarity_list.append((userID, sim))
         # print("\n\nSimilarity list: ", similarity_list)
     # print("\nSorted sim list: ", sorted(similarity_list, key=sorter, reverse=True))
     return sorted(similarity_list, key=sorter, reverse=True)
@@ -225,46 +225,56 @@ def print_similar_recommendations(id_to_title, recommendation_list):
 
 def main():
     clear()
+    print('\n' + '*' * 30)
 
-    # movie_ratings_dict = {MovieID: [user_id, rating]}
     movie_ratings_dict = get_movie_ratings_dict()
-    # print(movie_ratings_dict[1449])
+    print("\nStep 1.1 - All ratings for Movie ID 138:\n", movie_ratings_dict[138])
+    print('\n' + '*' * 30)
 
-    # movie_dict = {MovieID: MovieObject}
     movie_dict = get_movie_dict(movie_ratings_dict)
-    # print(movie_dict[40])
+    print("\nStep 1.2 - Average rating for Movie ID 138: \n", movie_dict[138].average)
+    print('\n' + '*' * 30)
 
-    # id_to_title = {ID: Title}
     id_to_title = set_ids_to_titles(movie_dict)
-    # print(id_to_title[2])
+    print("\nStep 1.3 - Title from Movie ID 138:\n", id_to_title[138])
+    print('\n' + '*' * 30)
 
-    # user_ratings_dict = {UserID:[movie_id, rating]}
     user_ratings_dict = get_user_ratings_dict()
-    # print(user_ratings_dict[1])
 
-    # user_dict = {UserID: UserObject}
     user_dict = get_user_dict(user_ratings_dict)
-    # print(user_dict[356].ratings[:3])
-    # print("User dict, highest ratings from X: ", user_dict[1].highest_rated)
-    top_picks = find_top_picks(movie_dict)
-    # print(top_picks[:10])
+    print("\nStep 1.4 - First 10 of all ratings for user 591\n", user_dict[591].ratings[:10])
+    print('\n' + '*' * 30)
 
+    top_picks = find_top_picks(movie_dict)
+    print("\nStep 3.1 - First 10 values in list of the overall top picks (default 50 ratings to be included):\n")
     show_top_picks_with_title(movie_dict, top_picks, id_to_title, 10)
+    print('\n' + '*' * 30)
+
     user = 25
-    # user2 = 1
+    user2 = 1
+
     top_picks_for_user = find_top_picks_for_user(movie_ratings_dict, user_ratings_dict, top_picks, user)
-    show_top_picks_with_title(movie_dict, top_picks_for_user, id_to_title, 40)
-    # print(top_picks_for_user[:20])
+    print("\nStep 3.2 - First 10 values in list of the top_picks_for_user:\n")
+    show_top_picks_with_title(movie_dict, top_picks_for_user, id_to_title, 10)
+    print('\n' + '*' * 30)
+
     movies_both_rated = get_common_user_ratings(user_dict, user, user2)
+    print("\nStep 4.1 - First 10 values in list of movies that both specified users have rated:\n", movies_both_rated[:10])
+    print('\n' + '*' * 30)
+
     similarity = euclidean_distance(user_dict, user, user2, movies_both_rated)
+    print("\nStep 4.2 - Similarity rating of 2 users from euclidean_distance:\n", similarity)
+    print('\n' + '*' * 30)
 
     similarity_list = get_similarity_list(user_dict, user)
-    # print(similarity_list)
+    print("\nStep 5.1 - First 10 values in list of all users sorted by those whose taste is most similar to the user: \n", similarity_list[:10])
+    print('\n' + '*' * 30)
 
     recommendation_list = find_highest_rated_by_similar_users(user_dict, similarity_list, user)
-    # print("\nRecommended list: ", recommendation_list)
 
+    print("\nStep 5.2 - First 10 recommendations based on tastes of similar users:\n")
     print_similar_recommendations(id_to_title, recommendation_list)
+    print('\n' + '*' * 30)
 
 
 

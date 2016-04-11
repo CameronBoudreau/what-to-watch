@@ -26,7 +26,7 @@ class Movie:
     def __init__(self, row, ratings):
         self.id = int(row['MovieID'])
         self.title = row['MovieTitle']
-        self.ratings = ratings
+        self.ratings = sorted(ratings)
         self.average = self.find_average_rating(ratings)
         self.number_of_ratings = len(ratings)
         self.url = row['URL']
@@ -46,8 +46,6 @@ class Movie:
         for i in row[4:]:
             if row[i] == 1:
                 self.genres.append(i)
-
-
 
 
 class User:
@@ -362,11 +360,11 @@ def is_valid_movie_id(movie_id):
     return True
 
 def display_movie_info(movie_dict, movie_id, movie_title):
-    state = input("Would you like to:\n\n1) See general information about this movie\n2) See ratings for this movie\n>")
+    choice = input("Would you like to:\n\n1) See general information about this movie\n2) See ratings for this movie\n>")
 
-    if is_valid_track_input(state):
+    if is_valid_track_input(choice):
         clear()
-        if state = 1:
+        if choice = 1:
             print_title_bar(movie_title)
             show_general_movie_info(movie_dict, movie_id, movie_title)
         else:
@@ -380,8 +378,12 @@ def display_movie_info(movie_dict, movie_id, movie_title):
 
 
 def show_general_movie_info(movie_dict, movie_id, movie_title):
-    print("ID: {}\nAverage Rating: {}\nGenres: {}\n")
+    movie = movie_dict[movie_id]
+    print("ID: {}\tAverage Rating: {}\nGenres: {}\nIMDB URL: {}".format(movie_id, movie.average, ", ".join(movie.genres), movie.url))
     option = input("From here, you can:\n\n1)See ratings details\n2) Look up another movie\n3)Exit to the main menu\n>")
+
+    is_valid_option(option):
+
 
 
 
