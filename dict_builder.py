@@ -1,13 +1,11 @@
-
+import csv
 
 class DictBuilder():
-    self.movie_dict =
-
-
     def get_movie_dict(movie_ratings_dict):
         with open('u.item', encoding='latin_1') as f:
             movie_dict = {}
-            reader = csv.DictReader(f, fieldnames=['MovieID', 'MovieTitle'], delimiter='|')
+            reader = csv.DictReader(f, fieldnames=['MovieID', 'MovieTitle', '', '', 'URL', 'Unknown', 'Action', 'Adventure', 'Animation',
+                  "Children's", 'Comedy', 'Crime', 'Documentary', 'Drama', 'Fantasy', 'Film-Noir', 'Horror', 'Musical', 'Mystery', 'Romance', 'Sci-Fi', 'Thriller', 'War',  'Western'], delimiter='|')
             for row in reader:
                 movie_dict[int(row['MovieID'])] = Movie(row, movie_ratings_dict[int(row['MovieID'])])
         return movie_dict
@@ -44,8 +42,6 @@ class DictBuilder():
                 for row in reader:
                     user_dict[int(row['UserID'])] = User(row, user_ratings_dict[int(row['UserID'])])
             return user_dict
-
-
 
 
     def set_ids_to_titles(movie_dict):

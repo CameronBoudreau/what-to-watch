@@ -1,20 +1,10 @@
 import csv
 import os
 import math
-from time import sleep
-import sys
+import time
 
 
-def print_text(a_string, a_is_slow):
-    if a_is_slow:
-        for words in a_string + "\n":
-            sys.stdout.write(words)
-            sys.stdout.flush()
-            sleep(.03)
-    else:
-        print(a_string)
-
-
+# Function to clear the screen
 def clear():
     if os.name == 'nt':
         os.system('cls')
@@ -75,24 +65,34 @@ class User:
         return val[1]
 
 
-
 def get_movie_dict(movie_ratings_dict):
     with open('u.item', encoding='latin_1') as f:
         movie_dict = {}
-        reader = csv.DictReader(f, fieldnames=['MovieID', 'MovieTitle', '', '', 'URL', 'Unknown', 'Action', 'Adventure', 'Animation',
-              "Children's", 'Comedy', 'Crime', 'Documentary', 'Drama', 'Fantasy', 'Film-Noir', 'Horror', 'Musical', 'Mystery', 'Romance', 'Sci-Fi', 'Thriller', 'War',  'Western'], delimiter='|')
+        reader = csv.DictReader(f, fieldnames=[
+            'MovieID', 'MovieTitle', '', '', 'URL', 'Unknown', 'Action',
+            'Adventure', 'Animation', "Children's", 'Comedy', 'Crime',
+            'Documentary', 'Drama', 'Fantasy', 'Film-Noir', 'Horror',
+            'Musical', 'Mystery', 'Romance', 'Sci-Fi', 'Thriller', 'War',
+            'Western'
+        ], delimiter='|')
         for row in reader:
-            movie_dict[int(row['MovieID'])] = Movie(row, movie_ratings_dict[int(row['MovieID'])])
+            movie_dict[int(row['MovieID'])] = Movie(row, movie_ratings_dict[
+                int(row['MovieID'])
+            ])
     return movie_dict
 
 
 def get_movie_ratings_dict():
     with open('u.data', encoding='latin_1') as f:
         movie_ratings_dict = {}
-        reader = csv.DictReader(f, fieldnames=['UserID', 'MovieID', 'Rating', 'Time'], delimiter='\t')
+        reader = csv.DictReader(f, fieldnames=[
+            'UserID', 'MovieID', 'Rating', 'Time'
+        ], delimiter='\t')
         for row in reader:
             if int(row['MovieID']) in movie_ratings_dict:
-                movie_ratings_dict[int(row['MovieID'])].append((int(row['UserID']), int(row['Rating'])))
+                movie_ratings_dict[int(row['MovieID'])].append(
+                    (int(row['UserID']), int(row['Rating']))
+                )
             else:
                 movie_ratings_dict[int(row['MovieID'])] = [(int(row['UserID']), int(row['Rating']))]
     return movie_ratings_dict
@@ -134,6 +134,7 @@ def find_top_picks(movie_dict, number_of_ratings=25):
 
     return sorted(top_picks, key=sorter, reverse=True)
 
+
 def find_top_picks_for_user(user_dict, top_picks, user):
     user = user_dict[user]
     user_top_picks = top_picks
@@ -147,6 +148,7 @@ def find_top_picks_for_user(user_dict, top_picks, user):
 
 def sorter(val):
     return val[1]
+
 
 def show_top_picks_with_title(movie_dict, top_picks, id_to_title, number_to_show=20):
     count = 1
@@ -486,8 +488,6 @@ def search_for_movies(movie_dict, search_for_movie_message):
 
     if is_valid_two_track_input(choice):
         if int(choice) == 1:
-            # clear()
-            # print_title_bar(lets_find_your_movie_message)
             print('')
             return get_movie_id(search_for_movie_message)
         else:
@@ -516,7 +516,7 @@ def get_user_to_look_up(user_dict, find_user_message):
 
 def display_user_ratings(user_dict, user_id, id_to_title, user_look_up_message, number_to_show=15, sort=0, greeting="Welcome to Movie Heaven!"):
     user = user_dict[user_id]
-    print("User {} ({}, {}, {}) has rated {} movies. Showing 1 - {}: \n".format(user_id, user.age, user,sex, user.occupation, len(user.ratings), number_to_show))
+    print("User {} ({}, {}, {}) has rated {} movies. Showing 1 - {}: \n".format(user_id, user.age, user.sex, user.occupation, len(user.ratings), number_to_show))
 
     ratings = user.ratings
 
@@ -723,18 +723,10 @@ def main():
             clear()
             print('\n\n')
             print_title_bar("Bye! Come back soon!")
-            sleep(2.5)
+            time.sleep(2.5)
             break
 
     clear()
-
-
-
-
-    # top_picks_for_user = find_top_picks_for_user(movie_ratings_dict, user_ratings_dict, top_picks, user)
-    # show_top_picks_with_title(movie_dict, top_picks_for_user, id_to_title, 40)
-
-
 
 
 if __name__ == '__main__':
