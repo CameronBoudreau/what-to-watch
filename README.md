@@ -1,10 +1,17 @@
-WHAT TO WATCH:
+#WHAT TO WATCH:
 
-The program maintains a database of a lsit of movies, users, and ratings in order to recommend a movie. This is based on the user's demographic information.
+The program maintains a database of movies, users, and ratings in order to recommend a movie. This is based on the user's demographic information.
 
 Includes recommending based popular movies and based on the user and movies they have seen already.
 
-Full list of Movie ID Codes:
+## How to use
+This is a command line based app, so run it from your terminal with "python what_to_watch.py". The menus will guide you through the movie information and recommendations.
+
+## Note on the code
+This was written as a weekend assignment 2 weeks into The Iron Yard. The code is not yet refactored as I only had time to get it working the way I wanted before turning it in. There is a separate branch with the code refactored into separate files that is a work in progress.
+
+
+## Full list of Movie ID Codes:
 
 1: Toy Story (1995)
 2: GoldenEye (1995)
